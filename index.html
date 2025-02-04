@@ -10,6 +10,16 @@
         .input-group { margin-bottom: 10px; }
         input { width: 100px; margin-left: 10px; }
         .results { margin-top: 20px; }
+        .copy-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            margin-top: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .copy-button:hover { background-color: #45a049; }
     </style>
 </head>
 <body>
@@ -41,6 +51,7 @@
     <div class="results">
         <h3>Total Master Mix:</h3>
         <ul id="master_mix_results"></ul>
+        <button class="copy-button" onclick="copyToClipboard()">Copy Results 📋</button>
     </div>
 </div>
 
@@ -66,7 +77,33 @@ function calculateMasterMix() {
         resultList.appendChild(listItem);
     });
 }
-window.onload = calculateMasterMix; // Run once on page load
+
+function copyToClipboard() {
+    let numSamples = document.getElementById("num_samples").value;
+    let extraReactions = document.getElementById("extra_reactions").value;
+    let totalReactions = parseFloat(numSamples) + parseFloat(extraReactions);
+
+    let reagents = {
+        "Enzyme": parseFloat(document.getElementById("enzyme").value) || 0,
+        "Buffer": parseFloat(document.getElementById("buffer").value) || 0,
+        "Water": parseFloat(document.getElementById("water").value) || 0
+    };
+
+    let textToCopy = `Master Mix Calculation:\n- Number of Samples: ${numSamples}\n- Extra Reactions: ${extraReactions}\n- Total Reactions: ${totalReactions}\n\nReagents:\n`;
+
+    Object.keys(reagents).forEach(reagent => {
+        let totalVolume = (reagents[reagent] * totalReactions).toFixed(2);
+        textToCopy += `- ${reagent}: ${totalVolume} µL\n`;
+    });
+
+    navigator.clipboard.writeText(textToCopy).then(() => {
+        alert("Master Mix copied to clipboard! 📋");
+    }).catch(err => {
+        console.error("Failed to copy!", err);
+    });
+}
+
+window.onload = calculateMasterMix;
 </script>
 
 </body>
